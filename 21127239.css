@@ -1,0 +1,62 @@
+.bg-light-red{
+    background-color: #f8d3d3;
+    border-width: 1px;
+    border-color: #f8d3d3;
+    border-style: solid;
+}
+
+.bg-dark-red{
+    background-color: #7e0000;
+    border-width: 1px;
+    border-color: red;
+    border-style: solid;
+}
+
+.movie_light_info{
+    font-size: 30px;
+    color: #5c2922;
+}
+
+.movie_dark_info{
+    font-size: 30px;
+    color: #f8d3d3;
+}
+
+.color_header_light_text{
+    color: #5c2922;
+}
+
+.color_header_dark_text{
+    color: #f8d3d3;
+}
+
+.navbar_light_color{
+    background-color: #dde9fc;
+    border-width: 1px;
+    border-color: #dde9fc;
+    border-style: solid;
+}
+
+.navbar_dark_color{
+    background-color: #002582;
+    border-width: 1px;
+    border-color: #83a1eb;
+    border-style: solid;
+}
+
+#app{
+    max-width: 1200px;
+    margin: auto;
+}
+
+.light_search::placeholder{
+    color:black;
+}
+
+.dark_search::placeholder{
+    color:#b3b5b9
+}
+
+body{
+    background-color: white;
+}
