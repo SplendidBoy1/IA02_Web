@@ -1,5 +1,5 @@
 import {ref, computed} from 'vue'
-import {header_Object, navBar_Object, content_Object} from "./layouts.js"
+import {header_Object, navBar_Object, content_Object, Searchcontent_Object} from "./layouts.js"
 
 
 async function getData() {
@@ -146,20 +146,22 @@ async function split_fetch(para){
 
 // getData()
 const data = await split_fetch("search/name/?per_page=6&page=1")
-console.log(data)
+// console.log(data)
 
 
 
 export default {
     data(){
         return{
+            search : '',
             light: ref(true),
-            curr_content: "display_content"
+            curr_content: "content_Object"
         }
     },
     provide(){
         return {
             light: computed(() => this.light),
+            search: computed(() => this.search)
         }
     },
     methods:{
@@ -167,20 +169,33 @@ export default {
             //console.log("Asdafsd")
             this.light = data
             // console.log(this.light)
+        },
+        Search_movie(data){
+            this.search = data
+            // console.log( "asdf")
+            this.curr_content = "Searchcontent_Object"
+            // console.log(this.curr_content)
+            // console.log(this.search)
+        },
+        return_homePage(data){
+            // console.log("Asdf")
+            if (data == true){
+                this.curr_content = "content_Object";
+            }
         }
     },
-    components: {header_Object, navBar_Object, content_Object},
+    components: {header_Object, navBar_Object, content_Object, Searchcontent_Object},
     template:`
     <div class="row my-1 px-1">
         <div class="col-12 mb-2">
-            <header_Object @switch-mode="Switch_mode"/>
+            <header_Object @switch-mode="Switch_mode"  />
         </div>
         <div class="col-12 px-0">
-            <navBar_Object/>
+            <navBar_Object @search-movie="Search_movie" @return_Page_content="return_homePage"/>
         </div>
     </div>
     <div class="row my-1 px-1">
-        <content_Object/>
+        <component :is="curr_content"/>
     </div>
     `
 }

@@ -13,7 +13,7 @@ export const header_Object = {
             let _mode = event.target.checked
             // console.log(_mode)
             if (_mode == true){
-                $("body").css("background-color", "#4d4d4d");
+                $("body").css("background-color", "#1c2220");
                 this.$emit('switchMode', false)
                 // console.log("Asdf")
                 this.light = ref(false)
@@ -61,13 +61,31 @@ export const navBar_Object = {
             light: inject('light')
         }
     },
+    methods:{
+        return_Page_content(){
+            console.log("asdf")
+            this.$emit('return_Page_content', true)
+        },
+        Search_method(event){
+            const formdata = new FormData(event.target);
+            let search = Object.fromEntries(formdata)['search'];
+            // let int_search = parseInt(search);
+            console.log(Object.fromEntries(formdata)['mode_search'])
+            this.$emit('searchMovie', search)
+            //console.log(search)
+        }
+    },
     template: `
     <nav class="navbar navbar-expand-md rounded" :class="light ? 'navbar_light_color' : 'navbar_dark_color'">
         <div class="container-fluid">
-            <a class="navbar-brand" :class="light ? 'text-dark' : 'text-light'" href="#">
+            <a class="navbar-brand" :class="light ? 'text-dark' : 'text-light'" href="#" @click="return_Page_content">
                 <i class="fa-solid fa-house"></i>
             </a>
-            <form class="d-flex" role="search">
+            <form class="d-flex" role="search" @submit.prevent="Search_method">
+                <select class="form-select form-select-sm size_box" name="mode_search" id="mode_search">
+                    <option value="movie">Movie</option>
+                    <option value="name">Name of Actor</option>
+                </select>
                 <input name="search" class="form-control me-2" :class="light ? 'bg-light light_search' : 'bg-dark dark_search'" type="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
             </form>
@@ -154,7 +172,7 @@ export const DB_fetch = {
                     else{
                         filter_rs = rs
                     }
-                    // console.log(filter_rs)
+                    console.log(filter_rs)
                     let per_page = parseInt(paras[0].split('=')[1])
                     let page = parseInt(paras[1].split('=')[1])
                     const total = filter_rs.length
@@ -162,10 +180,13 @@ export const DB_fetch = {
                     const total_page = Math.ceil(total/per_page)
                     let items = []
                     if (per_page*(page) > filter_rs.length){
-                        items = filter_rs
-                        per_page = filter_rs.length
-                        page = 1
+                        items = filter_rs.slice((page - 1)*per_page, filter_rs.length)
                     }
+                    // if (per_page*(page) > filter_rs.length){
+                    //     items = filter_rs
+                    //     per_page = filter_rs.length
+                    //     page = 1
+                    // }
                     else{
                         items = filter_rs.slice((page - 1)*per_page, (per_page)*page)
                     }
@@ -218,9 +239,11 @@ export const DB_fetch = {
 export const mostPopular_Object = {
     data(){
         return{
+            light: inject('light'),
             data : {},
             per_page : 3,
-            page : 1
+            page : 1,
+            total_page: 0
         }
     },
     provide(){
@@ -229,39 +252,109 @@ export const mostPopular_Object = {
         }
     },
     methods: {
-        
+        async load_data(per_page, page){
+            let promise = await this.$refs.fetch_data.fetch_data('get/mostpopular/?per_page=' + per_page + '&page=' + page)
+            this.data = promise
+            this.per_page = per_page
+            this.page = page
+            this.total_page = this.data['total_page']
+            console.log(this.data)
+        }
     },
     components:{DB_fetch},
     template:`
-    <div class="row">
+    <div class="row mb-3" :class="light ? 'text-dark' : 'text-light'">
         <b>
         Most Popular
         </b>
     </div>
     <div class="row">
         <DB_fetch ref="fetch_data"/>
-        <div class="col-1">
+        <div class="col-1 d-flex justify-content-end" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page > 1) ? load_data(per_page, page - 1) : null">
+            <i class="fa-solid fa-less-than"></i>
         </div>
         <div class="col-10">
             <div class="row">
                 <div v-for="i in data['items']" class="col-4">
-                    <div>
-                        <img :src="i.image" style="height:250px; width:100%;">
+                    <div class="border-3 rounded">
+                        <img class="rounded" :src="i.image" style="height:250px; width:100%;">
                     </div>  
                 </div>
             </div> 
-            
         </div>
-        <div class="col-1">
+        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? load_data(per_page, page + 1) : null">
+            <i class="fa-solid fa-greater-than"></i>
         </div>
     </div>
     `,
     setup(){
-        
     },
-    async mounted(){
-        let promise = await this.$refs.fetch_data.fetch_data('get/mostpopular/?per_page=' + this.per_page + '&page=' + this.page)
-        this.data = promise
+    mounted(){
+        this.load_data(3, 1)
+        // promise.then(value => {
+        //     this.data = value
+        // }).catch(err => {
+        //     this.data = {}
+        // })
+        // console.log(this.data)
+    }
+}
+
+export const topRating_Object = {
+    data(){
+        return{
+            light: inject('light'),
+            data : {},
+            per_page : 3,
+            page : 1,
+            total_page: 0
+        }
+    },
+    provide(){
+        return {
+            data: computed(() => this.data),
+        }
+    },
+    methods: {
+        async load_data(per_page, page){
+            let promise = await this.$refs.fetch_data.fetch_data('get/top50/?per_page=' + per_page + '&page=' + page)
+            this.data = promise
+            this.per_page = per_page
+            this.page = page
+            this.total_page = this.data['total_page']
+            console.log(this.data)
+        }
+    },
+    components:{DB_fetch},
+    template:`
+    <div class="row  mb-3" :class="light ? 'text-dark' : 'text-light'">
+        <b>
+        Top Rating
+        </b>
+    </div>
+    <div class="row">
+        <DB_fetch ref="fetch_data"/>
+        <div class="col-1 d-flex justify-content-end" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page > 1) ? load_data(per_page, page - 1) : null">
+            <i class="fa-solid fa-less-than"></i>
+        </div>
+        <div class="col-10">
+            <div class="row">
+                <div v-for="i in data['items']" class="col-4">
+                    <div class="border-3 rounded">
+                        <img class="rounded" :src="i.image" style="height:250px; width:100%;">
+                    </div>  
+                </div>
+            </div> 
+        </div>
+        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? load_data(per_page, page + 1) : null">
+            <i class="fa-solid fa-greater-than"></i>
+        </div>
+    </div>
+    `,
+    setup(){
+    },
+    mounted(){
+        this.load_data(3, 1)
         // promise.then(value => {
         //     this.data = value
         // }).catch(err => {
@@ -272,15 +365,102 @@ export const mostPopular_Object = {
 }
 
 export const content_Object = {
-    components: {mostPopular_Object},
+    components: {mostPopular_Object, topRating_Object},
     template:`
     <div class="col-12">
-        <div class="row px-0">
+        <div class="row px-0 mb-5">
             hhhh
         </div>
-        <div class="row px-0">
+        <div class="row px-0 mb-5">
             <mostPopular_Object/>
+        </div>
+        <div class="row px-0 mb-5">
+            <topRating_Object/>
+        </div>
+        <div class="row px-0">
+            asdf
         </div>
     </div>
     `
 }
+
+export const Searchcontent_Object = {
+    data(){
+        return {
+            light: inject('light'),
+            search: inject('search'),
+            per_page: 9,
+            page: 1,
+            total_page: 0,
+            data: {}
+        }
+    },
+    components:{DB_fetch},
+    methods:{
+        async load_data(search, per_page, page){
+            // console.log("aaa")
+            let promise = await this.$refs.fetch_data.fetch_data('search/movie/'+ search + '?per_page=' + per_page + '&page=' + page)
+            // console.log("aaa")
+            this.data = promise
+            this.per_page = per_page
+            this.page = page
+            this.total_page = this.data['total_page']
+            console.log(this.total_page)
+        }
+    },
+    watch :{
+        search : function (val) {
+            this.load_data(this.search, this.per_page, this.page)
+        }
+    }
+    ,
+    template:`
+    <DB_fetch ref="fetch_data"/>
+    <div class="row">
+        <div class="col-12 show_search  mt-4">
+            <div v-for="i in data['items']">
+                <div class="card" :class="light ? 'bg-light' : 'bg-dark'">
+                    <div class="card-header rounded d-flex justify-content-center">
+                        <img class="rounded" :src="i.image" width="300" height="400">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title d-flex justify-content-center" :class="light ? 'text-dark' : 'text-light'">
+                            {{i.fullTitle}}
+                        </h5>
+                        <div class="text-center" style="color: #b3b5b9">
+                            [
+                            <div style="color: #b3b5b9" class="d-inline-block" v-for="j in i['genreList']">{{j['key']}}&nbsp;</div>
+                            ]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li v-for="i in total_page" class="page-item">
+                        <a @click="load_data(search, per_page, i)" :class="{'page-link':true, active:page===i}" href="#">{{i}}
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    `,
+    mounted(){
+        this.load_data(this.search, this.per_page, this.page)
+        // console.log(this.per_page)
+        // console.log(this.total_page)
+        // console.log("hahahah")
+        // console.log(this.search)
+    },
+}
+
+
+
+
+
+
