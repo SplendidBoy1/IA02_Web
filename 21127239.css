@@ -49,6 +49,14 @@
     margin: auto;
 }
 
+.light_search:focus{
+    color: black;
+}
+
+.dark_search:focus{
+    color: white;
+}
+
 .light_search::placeholder{
     color:black;
 }
@@ -63,7 +71,12 @@ body{
 
 .show_popular{
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: 33.33% 33.33% 33.33%;
+}
+
+.show_top{
+    display: grid;
+    grid-template-columns: 33.33% 33.33% 33.33%;
 }
 
 .show_search{
@@ -81,3 +94,62 @@ body{
 .card-body{
     height: 150px;
 }
+
+.slide_animation_right {
+    position: static;
+    animation-name: slide_right;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+  }
+  
+  @keyframes slide_right {
+    from {opacity:1; margin-left: 0;}
+    to {opacity:0.2; margin-left: -100px;}
+  }
+
+  .slide_animation_left {
+    position: static;
+    animation-name: slide_left;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+  }
+  
+  @keyframes slide_left {
+    from {opacity:1; margin-left: 0;}
+    to {opacity:0.2; margin-left: 100px;}
+  }
+
+
+.animation_hover {
+    animation-name: hover;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes hover {
+    from {
+        position: relative;
+        width: 100%;
+        height: 250px;
+    }
+    to {
+        position: relative;
+        z-index: 10;
+        width: 110%;
+        height: 280px;
+        /* position: absolute; */
+    }
+  }
+/* #slide {
+    position: absolute;
+    right: -100px; 
+    width: 100px;
+    height: 100px;
+    background: blue;
+    transition: 1s; 
+}
+
+.wrapper:hover #slide {
+    transition: 1s;
+    right: 0;
+} */

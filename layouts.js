@@ -71,7 +71,7 @@ export const navBar_Object = {
             let search = Object.fromEntries(formdata)['search'];
             // let int_search = parseInt(search);
             console.log(Object.fromEntries(formdata)['mode_search'])
-            this.$emit('searchMovie', search)
+            this.$emit('searchMovie', {search: search, mode_search: Object.fromEntries(formdata)['mode_search']})
             //console.log(search)
         }
     },
@@ -97,7 +97,7 @@ export const navBar_Object = {
 export const DB_fetch = {
     data(){
         return{
-            URL: "http://34.96.146.191:2422"
+            URL: "http://34.96.146.191:2422",
         }
     },
     methods: {
@@ -259,6 +259,47 @@ export const mostPopular_Object = {
             this.page = page
             this.total_page = this.data['total_page']
             console.log(this.data)
+        },
+        async play_animation_slide(str_slide){
+            // console.log($('#popular_movie'))
+            if (str_slide == false){
+                $('.popular_movie').addClass("slide_animation_right")
+                setTimeout(() => {
+                $('.popular_movie').removeClass("slide_animation_right")
+              }, 500)
+            }
+            else{
+                $('.popular_movie').addClass("slide_animation_left")
+                setTimeout(() => {
+                $('.popular_movie').removeClass("slide_animation_left")
+              }, 500)
+            }
+            // asetTimeout($('#popular_movie').removeClass("slide_animation"), 1000)
+            console.log("asdfasdffffffffffffffffff")
+        },
+        click_new_page(per_page, page, str_slide){
+            // console.log("Asdf")
+            this.load_data(per_page, page)
+            this.play_animation_slide(str_slide)
+        },
+        hover_animation(id){
+            console.log(id)
+            let str_search = "#" + id + " b"
+            // $("#" + id).removeClass("z-1")
+            // $("#" + id).addClass("z-3")
+            $("#" + id +" img").addClass("animation_hover")
+            $(str_search).removeClass("invisible")
+            $(str_search).addClass("visible")
+        },
+        remove_hover(id){
+            console.log(id)
+            let str_search = "#" + id + " b"
+            // $("#" + id).removeClass("z-3")
+            // $("#" + id).addClass("z-1")
+            console.log($("#" + id).html())
+            $("#" + id +" img").removeClass("animation_hover")
+            $(str_search).removeClass("visible")
+            $(str_search).addClass("invisible")
         }
     },
     components:{DB_fetch},
@@ -270,19 +311,20 @@ export const mostPopular_Object = {
     </div>
     <div class="row">
         <DB_fetch ref="fetch_data"/>
-        <div class="col-1 d-flex justify-content-end" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page > 1) ? load_data(per_page, page - 1) : null">
+        <div class="col-1 d-flex justify-content-end" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page > 1) ? click_new_page(per_page, page - 1, true) : null">
             <i class="fa-solid fa-less-than"></i>
         </div>
         <div class="col-10">
-            <div class="row">
-                <div v-for="i in data['items']" class="col-4">
-                    <div class="border-3 rounded">
-                        <img class="rounded" :src="i.image" style="height:250px; width:100%;">
-                    </div>  
+            <div class="row show_popular">
+                <div v-for="i in data['items']" class="popular_movie" @mouseover="hover_animation(i.id)" @mouseout="remove_hover(i.id)">
+                    <div class="border-3 rounded d-block" :id="i.id">
+                        <img class="rounded z-n1" :src="i.image" style="height:250px; width:100%;">
+                        <b class="invisible d-flex justify-content-center text-light z-3 position-relative" style="margin-top: -40px">{{i.title}}</b>
+                    </div>
                 </div>
             </div> 
         </div>
-        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? load_data(per_page, page + 1) : null">
+        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? click_new_page(per_page, page + 1, false) : null">
             <i class="fa-solid fa-greater-than"></i>
         </div>
     </div>
@@ -307,7 +349,7 @@ export const topRating_Object = {
             data : {},
             per_page : 3,
             page : 1,
-            total_page: 0
+            total_page: 0,
         }
     },
     provide(){
@@ -323,6 +365,42 @@ export const topRating_Object = {
             this.page = page
             this.total_page = this.data['total_page']
             console.log(this.data)
+        },
+        async play_animation_slide(str_slide){
+            // console.log($('#popular_movie'))
+            if (str_slide == false){
+                $('.top_movie').addClass("slide_animation_right")
+                setTimeout(() => {
+                $('.top_movie').removeClass("slide_animation_right")
+              }, 500)
+            }
+            else{
+                $('.top_movie').addClass("slide_animation_left")
+                setTimeout(() => {
+                $('.top_movie').removeClass("slide_animation_left")
+              }, 500)
+            }
+            // asetTimeout($('#top_movie').removeClass("slide_animation"), 1000)
+            console.log("asdfasdffffffffffffffffff")
+        },
+        click_new_page(per_page, page, str_slide){
+            // console.log("Asdf")
+            this.load_data(per_page, page)
+            this.play_animation_slide(str_slide)
+        },
+        hover_animation(id){
+            console.log(id)
+            let str_search = "#" + id + " p"
+            console.log($("#" + id).html())
+            $(str_search).removeClass("invisible")
+            $(str_search).addClass("visible")
+        },
+        remove_hover(id){
+            console.log(id)
+            let str_search = "#" + id + " p"
+            console.log($("#" + id).html())
+            $(str_search).removeClass("visible")
+            $(str_search).addClass("invisible")
         }
     },
     components:{DB_fetch},
@@ -334,19 +412,20 @@ export const topRating_Object = {
     </div>
     <div class="row">
         <DB_fetch ref="fetch_data"/>
-        <div class="col-1 d-flex justify-content-end" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page > 1) ? load_data(per_page, page - 1) : null">
+        <div class="col-1 d-flex justify-content-end" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page > 1) ? click_new_page(per_page, page - 1, true) : null">
             <i class="fa-solid fa-less-than"></i>
         </div>
         <div class="col-10">
-            <div class="row">
-                <div v-for="i in data['items']" class="col-4">
-                    <div class="border-3 rounded">
+            <div class="row show_top">
+                <div v-for="i in data['items']" class="top_movie" @mouseover="hover_animation(i.id)" @mouseout="remove_hover(i.id)">
+                    <div class="border-3 rounded" :id="i.id">
                         <img class="rounded" :src="i.image" style="height:250px; width:100%;">
+                        <p class="invisible">{{i.title}}</p>
                     </div>  
                 </div>
             </div> 
         </div>
-        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? load_data(per_page, page + 1) : null">
+        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? click_new_page(per_page, page + 1, false) : null">
             <i class="fa-solid fa-greater-than"></i>
         </div>
     </div>
@@ -389,6 +468,7 @@ export const Searchcontent_Object = {
         return {
             light: inject('light'),
             search: inject('search'),
+            mode_search: inject('search_mode'),
             per_page: 9,
             page: 1,
             total_page: 0,
@@ -397,11 +477,12 @@ export const Searchcontent_Object = {
     },
     components:{DB_fetch},
     methods:{
-        async load_data(search, per_page, page){
-            // console.log("aaa")
-            let promise = await this.$refs.fetch_data.fetch_data('search/movie/'+ search + '?per_page=' + per_page + '&page=' + page)
+        async load_data(mode, search, per_page, page){
+            console.log(mode)
+            let promise = await this.$refs.fetch_data.fetch_data('search/' + mode + '/' + search + '?per_page=' + per_page + '&page=' + page)
             // console.log("aaa")
             this.data = promise
+            console.log(this.data)
             this.per_page = per_page
             this.page = page
             this.total_page = this.data['total_page']
@@ -410,7 +491,10 @@ export const Searchcontent_Object = {
     },
     watch :{
         search : function (val) {
-            this.load_data(this.search, this.per_page, this.page)
+            this.load_data(this.mode_search, this.search, this.per_page, this.page)
+        },
+        mode_search : function (val) {
+            this.load_data(this.mode_search, this.search, this.per_page, this.page)
         }
     }
     ,
@@ -442,7 +526,7 @@ export const Searchcontent_Object = {
             <nav aria-label="Page navigation">
                 <ul class="pagination">
                     <li v-for="i in total_page" class="page-item">
-                        <a @click="load_data(search, per_page, i)" :class="{'page-link':true, active:page===i}" href="#">{{i}}
+                        <a @click="load_data(mode_search,search, per_page, i)" :class="{'page-link':true, active:page===i}" href="#">{{i}}
                         </a>
                     </li>
                 </ul>
@@ -451,7 +535,7 @@ export const Searchcontent_Object = {
     </div>
     `,
     mounted(){
-        this.load_data(this.search, this.per_page, this.page)
+        this.load_data(this.mode_search, this.search, this.per_page, this.page)
         // console.log(this.per_page)
         // console.log(this.total_page)
         // console.log("hahahah")
