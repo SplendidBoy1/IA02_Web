@@ -75,3 +75,212 @@ export const navBar_Object = {
     </nav>
     `
 }
+
+export const DB_fetch = {
+    data(){
+        return{
+            URL: "http://34.96.146.191:2422"
+        }
+    },
+    methods: {
+        async fetch_data(para){
+            let _class = para.split("/")
+            let url = this.URL
+            let mode_api = ""
+    
+            switch (_class[0]){
+                case "search":
+                mode_api = "search"
+                url = url + "/api/Movies"
+                break;
+
+                case "detail":
+                mode_api = "detail"
+                if (_class[1] == "movie"){
+                    url = url + "/api/Movies" 
+                }
+                else{
+                    if (_class[1] == "name"){
+                        url = url + "/api/Names"
+                 }
+                }
+                break;
+
+                case "get":
+                    mode_api = "get"
+                    if (_class[1] == "top50"){
+                        url = url + "/api/Top50Movies" 
+                    }
+                    else{
+                        if (_class[1] == "mostpopular"){
+                            url = url + "/api/MostPopularMovies"
+                        }
+                    }
+                    break;
+                default:
+                    break
+            }
+    //console.log("Adf")
+            const data = await fetch(url)
+            const rs = await data.json()
+            let result = {};
+            if (mode_api == "search" || mode_api == "get"){
+                if (_class.length == 3){
+                    let search_str = _class[2].split('?')[0]
+                    let paras = _class[2].split('?')[1].split('&')
+                    let filter_rs = []
+                    if (search_str != ''){
+                        if (_class[1] == "movie"){
+                            for (let i = 0; i < rs.length; i++){
+                                // console.log(rs[i]['title'].toLowerCase())
+                                // console.log(search_str.toLowerCase())
+                                if (rs[i]['title'].toLowerCase().includes(search_str.toLowerCase())){
+                                    // console.log("Asdf")
+                                    filter_rs.push(rs[i])
+                                }
+                            }
+                        }
+                        else{
+                            for (let i = 0; i < rs.length; i++){
+                                for (let j = 0;j < rs[i]['actorList'].length; j++){
+                                    if (rs[i]['actorList'][j]['name'].toLowerCase().includes(search_str.toLowerCase())){
+                                        filter_rs.push(rs[i])
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        filter_rs = rs
+                    }
+                    // console.log(filter_rs)
+                    let per_page = parseInt(paras[0].split('=')[1])
+                    let page = parseInt(paras[1].split('=')[1])
+                    const total = filter_rs.length
+                    // console.log(filter_rs)
+                    const total_page = Math.ceil(total/per_page)
+                    let items = []
+                    if (per_page*(page) > filter_rs.length){
+                        items = filter_rs
+                        per_page = filter_rs.length
+                        page = 1
+                    }
+                    else{
+                        items = filter_rs.slice((page - 1)*per_page, (per_page)*page)
+                    }
+                    result = {'search' : search_str, 'per_page': per_page, 'page' : page, 'total' : total, 'total_page' : total_page, 'items': items}
+                }
+                else{
+                    // console.log(rs)
+                    const per_page = 4
+                    const page = 1
+                    const total = rs.length
+                    const total_page = Math.ceil(total/per_page)
+                    const items = rs.slice((page - 1)*per_page, (per_page)*page)
+                    result = {'search' : '', 'per_page': per_page, 'page' : page, 'total' : total, 'total_page' : total_page, 'items': items}
+                }
+            }
+            else{
+                // console.log("asdf")
+                if (_class.length == 3){
+                    const id = _class[2]
+                    const total = rs.length
+                    // const total_page = Math.ceil(total/per_page)
+                    for (let i = 0; i < total; i++){
+                        
+                        if (rs[i]['id'] === id){
+                            result = {'item' : rs[i]}
+                            console.log(rs[i])
+                            break;
+                        }
+                    }
+                }
+                else{
+                    const id = "tt0012349"
+                    const total = rs.length
+                    // const total_page = Math.ceil(total/per_page)
+                    for (let i = 0; i < total; i++){
+                        console.log(rs[i])
+                        if (rs[i]['id'] === id){
+                            result = {'item' : rs[i]}
+                            break;
+                        }
+                    }    
+                }
+            }
+            //console.log(result)
+            return result;
+        }
+    }
+}
+
+export const mostPopular_Object = {
+    data(){
+        return{
+            data : {},
+            per_page : 3,
+            page : 1
+        }
+    },
+    provide(){
+        return {
+            data: computed(() => this.data),
+        }
+    },
+    methods: {
+        
+    },
+    components:{DB_fetch},
+    template:`
+    <div class="row">
+        <b>
+        Most Popular
+        </b>
+    </div>
+    <div class="row">
+        <DB_fetch ref="fetch_data"/>
+        <div class="col-1">
+        </div>
+        <div class="col-10">
+            <div class="row">
+                <div v-for="i in data['items']" class="col-4">
+                    <div>
+                        <img :src="i.image" style="height:250px; width:100%;">
+                    </div>  
+                </div>
+            </div> 
+            
+        </div>
+        <div class="col-1">
+        </div>
+    </div>
+    `,
+    setup(){
+        
+    },
+    async mounted(){
+        let promise = await this.$refs.fetch_data.fetch_data('get/mostpopular/?per_page=' + this.per_page + '&page=' + this.page)
+        this.data = promise
+        // promise.then(value => {
+        //     this.data = value
+        // }).catch(err => {
+        //     this.data = {}
+        // })
+        // console.log(this.data)
+    }
+}
+
+export const content_Object = {
+    components: {mostPopular_Object},
+    template:`
+    <div class="col-12">
+        <div class="row px-0">
+            hhhh
+        </div>
+        <div class="row px-0">
+            <mostPopular_Object/>
+        </div>
+    </div>
+    `
+}

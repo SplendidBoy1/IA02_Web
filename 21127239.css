@@ -60,3 +60,8 @@
 body{
     background-color: white;
 }
+
+.show_popular{
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
