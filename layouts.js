@@ -141,6 +141,7 @@ export const DB_fetch = {
     //console.log("Adf")
             const data = await fetch(url)
             const rs = await data.json()
+            console.log(rs)
             let result = {};
             if (mode_api == "search" || mode_api == "get"){
                 if (_class.length == 3){
@@ -206,6 +207,7 @@ export const DB_fetch = {
                 // console.log("asdf")
                 if (_class.length == 3){
                     const id = _class[2]
+                    console.log(id)
                     const total = rs.length
                     // const total_page = Math.ceil(total/per_page)
                     for (let i = 0; i < total; i++){
@@ -288,8 +290,10 @@ export const mostPopular_Object = {
             // $("#" + id).removeClass("z-1")
             // $("#" + id).addClass("z-3")
             $("#" + id +" img").addClass("animation_hover")
+            
             $(str_search).removeClass("invisible")
             $(str_search).addClass("visible")
+            // $(str_search).addClass("animation_hover")
         },
         remove_hover(id){
             console.log(id)
@@ -298,8 +302,14 @@ export const mostPopular_Object = {
             // $("#" + id).addClass("z-1")
             console.log($("#" + id).html())
             $("#" + id +" img").removeClass("animation_hover")
+            
             $(str_search).removeClass("visible")
             $(str_search).addClass("invisible")
+            // $(str_search).removeClass("animation_hover")
+        },
+        Detail_movie(data){
+            // console.log("asdfasdf")
+            this.$emit("detailMovie", data)
         }
     },
     components:{DB_fetch},
@@ -317,14 +327,14 @@ export const mostPopular_Object = {
         <div class="col-10">
             <div class="row show_popular">
                 <div v-for="i in data['items']" class="popular_movie" @mouseover="hover_animation(i.id)" @mouseout="remove_hover(i.id)">
-                    <div class="border-3 rounded d-block" :id="i.id">
+                    <div class="border-3 rounded d-block" :id="i.id" @click="Detail_movie(i.id)" style="cursor: grab">
                         <img class="rounded z-n1" :src="i.image" style="height:250px; width:100%;">
-                        <b class="invisible d-flex justify-content-center text-light z-3 position-relative" style="margin-top: -40px">{{i.title}}</b>
+                        <b class="invisible d-flex justify-content-center text-light z-3 position-relative" style="margin-top: -50px; color: #b3b5b9">{{i.title}}</b>
                     </div>
                 </div>
             </div> 
         </div>
-        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? click_new_page(per_page, page + 1, false) : null">
+        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < 10) ? click_new_page(per_page, page + 1, false) : null">
             <i class="fa-solid fa-greater-than"></i>
         </div>
     </div>
@@ -381,7 +391,7 @@ export const topRating_Object = {
               }, 500)
             }
             // asetTimeout($('#top_movie').removeClass("slide_animation"), 1000)
-            console.log("asdfasdffffffffffffffffff")
+            //console.log("asdfasdffffffffffffffffff")
         },
         click_new_page(per_page, page, str_slide){
             // console.log("Asdf")
@@ -390,17 +400,25 @@ export const topRating_Object = {
         },
         hover_animation(id){
             console.log(id)
-            let str_search = "#" + id + " p"
-            console.log($("#" + id).html())
+            let str_search = "#" + id + " b"
+            //console.log($("#" + id).html())
+            $("#" + id +" img").addClass("animation_hover")
+            
             $(str_search).removeClass("invisible")
             $(str_search).addClass("visible")
         },
         remove_hover(id){
             console.log(id)
-            let str_search = "#" + id + " p"
-            console.log($("#" + id).html())
+            let str_search = "#" + id + " b"
+            //console.log($("#" + id).html())
+            $("#" + id +" img").removeClass("animation_hover")
+            
             $(str_search).removeClass("visible")
             $(str_search).addClass("invisible")
+        },
+        Detail_movie(data){
+            // console.log("asdfasdf")
+            this.$emit("detailMovie", data)
         }
     },
     components:{DB_fetch},
@@ -418,14 +436,14 @@ export const topRating_Object = {
         <div class="col-10">
             <div class="row show_top">
                 <div v-for="i in data['items']" class="top_movie" @mouseover="hover_animation(i.id)" @mouseout="remove_hover(i.id)">
-                    <div class="border-3 rounded" :id="i.id">
-                        <img class="rounded" :src="i.image" style="height:250px; width:100%;">
-                        <p class="invisible">{{i.title}}</p>
+                    <div class="border-3 rounded" :id="i.id" @click="Detail_movie(i.id)" style="cursor: grab">
+                        <img class="rounded z-n1" :src="i.image" style="height:250px; width:100%;">
+                        <b class="invisible d-flex justify-content-center text-light z-3 position-relative" style="margin-top: -50px; color: #b3b5b9">{{i.title}}</b>
                     </div>  
                 </div>
             </div> 
         </div>
-        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < total_page) ? click_new_page(per_page, page + 1, false) : null">
+        <div class="col-1" :class="light ? 'text-dark' : 'text-light'" style="margin: auto; cursor: grab" @click="(page < 10) ? click_new_page(per_page, page + 1, false) : null">
             <i class="fa-solid fa-greater-than"></i>
         </div>
     </div>
@@ -444,6 +462,12 @@ export const topRating_Object = {
 }
 
 export const content_Object = {
+    methods: {
+        detail_movie(data){
+            // console.log(data)
+            this.$emit("detailMovie", data)
+        }
+    },
     components: {mostPopular_Object, topRating_Object},
     template:`
     <div class="col-12">
@@ -451,10 +475,10 @@ export const content_Object = {
             hhhh
         </div>
         <div class="row px-0 mb-5">
-            <mostPopular_Object/>
+            <mostPopular_Object @detail-movie="detail_movie"/>
         </div>
         <div class="row px-0 mb-5">
-            <topRating_Object/>
+            <topRating_Object @detail-movie="detail_movie"/>
         </div>
         <div class="row px-0">
             asdf
@@ -478,7 +502,7 @@ export const Searchcontent_Object = {
     components:{DB_fetch},
     methods:{
         async load_data(mode, search, per_page, page){
-            console.log(mode)
+            // console.log(mode)
             let promise = await this.$refs.fetch_data.fetch_data('search/' + mode + '/' + search + '?per_page=' + per_page + '&page=' + page)
             // console.log("aaa")
             this.data = promise
@@ -486,7 +510,11 @@ export const Searchcontent_Object = {
             this.per_page = per_page
             this.page = page
             this.total_page = this.data['total_page']
-            console.log(this.total_page)
+            // console.log(this.total_page)
+        },
+        Detail_movie(data){
+            // console.log("asdfasdf")
+            this.$emit("detailMovie", data)
         }
     },
     watch :{
@@ -503,12 +531,12 @@ export const Searchcontent_Object = {
     <div class="row">
         <div class="col-12 show_search  mt-4">
             <div v-for="i in data['items']">
-                <div class="card" :class="light ? 'bg-light' : 'bg-dark'">
+                <div class="card" :class="light ? 'bg-light' : 'bg-dark'" @click="Detail_movie(i.id)" style="cursor:grab">
                     <div class="card-header rounded d-flex justify-content-center">
                         <img class="rounded" :src="i.image" width="300" height="400">
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title d-flex justify-content-center" :class="light ? 'text-dark' : 'text-light'">
+                        <h5 class="card-title d-flex justify-content-center text-center" :class="light ? 'text-dark' : 'text-light'">
                             {{i.fullTitle}}
                         </h5>
                         <div class="text-center" style="color: #b3b5b9">
@@ -543,8 +571,136 @@ export const Searchcontent_Object = {
     },
 }
 
+export const detailMovie_Object = {
+    data(){
+        return {
+            id_movie: inject('id_movie'),
+            data_movie: {},
+            light: inject('light')
+        }
+    },
+    components:{DB_fetch},
+    methods: {
+        async load_data(id){
+            // console.log(mode)
+            let promise = await this.$refs.fetch_data.fetch_data('detail/movie/' + id)
+            // console.log("aaa")
+            this.data_movie = promise.item
+            console.log(this.data_movie)
+            // console.log(this.total_page)
+        },
+        Detail_actor(id){
+            console.log(id)
+            this.$emit("detailActor", id)
+        }
+    },
+    template: `
+    <DB_fetch ref="fetch_data"/>
+    <div class="col-12 mt-5 mb-5">
+        <div class="row d-flex justify-content-center my-3">
+            <img class="image_detail" :src="data_movie.image">
+        </div>
+        <div class="row my-3">
+            <h5 class="text-center" :class="light ? 'text-dark' : 'text-light'">{{data_movie.fullTitle}}</h5>
+        </div>
+        <div class="row d-flex justify-content-center px-3">
+            <table :class="light ? 'text-dark' : 'text-light'">
+                <div class="layout_table">
+                    <tr>
+                        <td>
+                            <b>
+                                Title:
+                            </b>
+                            {{data_movie.title}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>
+                                Realease date:
+                            </b>
+                            {{data_movie.year}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>
+                                Director:
+                            </b>
+                            <div v-for="i in data_movie.directorList" class="px-2">
+                                {{i.name}}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>
+                                Category:
+                            </b>
+                            <div v-for="i in data_movie.genreList" class="px-2 d-inline-block">
+                                "{{i.key}}"&nbsp;
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <b>
+                                List of actors:
+                            </b>
+                            <a v-for="i in data_movie.actorList" class="px-2 d-inline-block" style="cursor: grab" @click="Detail_actor(i.id)">
+                                {{i.name}}&nbsp;
+                            </a>
+                        </td>
+                    </tr>
+                </div>
+                
+            </table>
+        </div>
+        <div class="row my-3" :class="light ? 'text-dark' : 'text-light'">
+            <b>
+                Plot:
+            </b>
+        </div>
+        <div class="row my-3 px-5" :class="light ? 'text-dark' : 'text-light'">
+            {{data_movie.plot}}
+        </div>
+    </div>
+    `,
+    mounted(){
+        this.load_data(this.id_movie)
+    }
+}
 
-
-
+export const detailActor_Object = {
+    data(){
+        return {
+            id_actor: inject('id_actor'),
+            data_actor: {},
+            light: inject('light')
+        }
+    },
+    components:{DB_fetch},
+    methods: {
+        async load_data(id){
+            console.log(id)
+            let promise = await this.$refs.fetch_data.fetch_data('detail/name/' + id)
+            // console.log("aaa")
+            this.data_actor = promise
+            console.log(this.data_actor)
+            // console.log(this.total_page)
+        }
+    },
+    template: `
+    <DB_fetch ref="fetch_data"/>
+    <div class="col-12 mt-5 mb-5">
+        <div class="row d-flex justify-content-center my-3">
+            <img class="image_detail" :src="data_actor.image">
+        </div>
+    </div>
+    `,
+    mounted(){
+        this.load_data(this.id_actor)
+    }
+}
 
 

@@ -1,5 +1,5 @@
 import {ref, computed} from 'vue'
-import {header_Object, navBar_Object, content_Object, Searchcontent_Object} from "./layouts.js"
+import {header_Object, navBar_Object, content_Object, Searchcontent_Object, detailMovie_Object, detailActor_Object} from "./layouts.js"
 
 
 async function getData() {
@@ -156,14 +156,18 @@ export default {
             search_mode: '',
             search : '',
             light: ref(true),
-            curr_content: "content_Object"
+            curr_content: "content_Object",
+            id_movie: '',
+            id_actor: ''
         }
     },
     provide(){
         return {
             light: computed(() => this.light),
             search: computed(() => this.search),
-            search_mode: computed(() => this.search_mode)
+            search_mode: computed(() => this.search_mode),
+            id_movie: computed(() => this.id_movie),
+            id_actor: computed(() => this.id_actor)
         }
     },
     methods:{
@@ -185,11 +189,20 @@ export default {
             if (data == true){
                 this.curr_content = "content_Object";
             }
+        },
+        show_Detailmovie(data){
+            console.log(data)
+            this.id_movie = data
+            this.curr_content = "detailMovie_Object"
+        },
+        show_Detailactor(data){
+            console.log(data)
+            this.id_actor = data
+            this.curr_content = "detailActor_Object"
         }
     },
-    components: {header_Object, navBar_Object, content_Object, Searchcontent_Object},
+    components: {header_Object, navBar_Object, content_Object, Searchcontent_Object, detailMovie_Object, detailActor_Object},
     template:`
-    <div class="slide_animation">asdfasdfsadfasdf</div>
     <div class="row my-1 px-1">
         <div class="col-12 mb-2">
             <header_Object @switch-mode="Switch_mode"  />
@@ -199,7 +212,7 @@ export default {
         </div>
     </div>
     <div class="row my-1 px-1">
-        <component :is="curr_content"/>
+        <component :is="curr_content" @detail-movie="show_Detailmovie" @detail-actor="show_Detailactor"/>
     </div>
     
     `
